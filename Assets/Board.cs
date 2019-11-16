@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public RectTransform corner;
 
-    // Update is called once per frame
-    void Update()
+    public Color[] colors;
+
+    private Vector2 _pieceSize;
+    private Vector2 _cornerCenterPos;
+
+    // Start is called before the first frame update
+    private void Start()
     {
-        
+        _pieceSize = corner.sizeDelta;
+        _cornerCenterPos = corner.anchoredPosition;
     }
 }
