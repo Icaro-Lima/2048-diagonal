@@ -6,12 +6,10 @@ public class Board : MonoBehaviour
 
     public RectTransform corner;
 
-    public Color[] pieceBackgroundColors;
-    public Color[] pieceFontColors;
+    public int boardGridThickness;
 
-    public int gridThickness;
-    public int gridWidth;
-    public int gridHeight;
+    public int gridRows;
+    public int gridColumns;
 
     private Vector2 _pieceSize;
     private Vector2 _cornerCenterPos;
@@ -26,7 +24,7 @@ public class Board : MonoBehaviour
         _cornerCenterPos = corner.anchoredPosition;
 
         _occupiedSlots = 0;
-        _grid = new Piece[gridWidth, gridHeight];
+        _grid = new Piece[gridColumns, gridRows];
 
         SpawnPiece2Random();
         SpawnPiece2Random();
@@ -83,6 +81,6 @@ public class Board : MonoBehaviour
     private Vector2 GridPosToBoardPos(Vector2Int gridPos)
     {
         return _cornerCenterPos +
-               Vector2.Scale(gridPos, _pieceSize + new Vector2(gridThickness, gridThickness));
+               Vector2.Scale(gridPos, _pieceSize + new Vector2(boardGridThickness, boardGridThickness));
     }
 }
