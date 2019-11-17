@@ -1,6 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class Board : MonoBehaviour
+public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     public GameObject piecePrefab;
 
@@ -17,6 +20,8 @@ public class Board : MonoBehaviour
     private int _occupiedSlots;
     private Piece[,] _grid;
 
+    private Vector2 _beginDragPos;
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -28,6 +33,112 @@ public class Board : MonoBehaviour
 
         SpawnPiece2Random();
         SpawnPiece2Random();
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        _beginDragPos = eventData.position;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        Vector2 diff = eventData.position - _beginDragPos;
+
+        MoveBoardToDir(diff.x >= 0 ? 1 : -1, diff.y >= 0 ? 1 : -1);
+        SpawnPiece2Random();
+    }
+
+    private void MoveBoardToDir(int dirx, int diry)
+    {
+        Queue<Vector2Int> q = new Queue<Vector2Int>();
+
+        if (dirx == 1 && diry == 1)
+        {
+            q.Enqueue(new Vector2Int(_grid.GetLength(0) - 1, _grid.GetLength(1) - 1));
+        }
+        else if (dirx == -1 && diry == 1)
+        {
+            q.Enqueue(new Vector2Int(0, _grid.GetLength(1) - 1));
+        }
+        else if (dirx == -1 && diry == -1)
+        {
+            q.Enqueue(new Vector2Int(0, 0));
+        }
+        else
+        {
+            q.Enqueue(new Vector2Int(_grid.GetLength(0) - 1, 0));
+        }
+
+        int idx = 0;
+        int[,] order = new int[_grid.GetLength(0), _grid.GetLength(1)];
+        bool[,] visited = new bool[_grid.GetLength(0), _grid.GetLength(1)];
+        while (q.Count > 0)
+        {
+            Vector2Int act = q.Dequeue();
+
+            if (act.x < 0 || act.y < 0 || act.x >= _grid.GetLength(0) || act.y >= _grid.GetLength(1))
+            {
+                continue;
+            }
+
+            if (visited[act.x, act.y])
+            {
+                continue;
+            }
+
+            order[act.x, act.y] = idx++;
+
+            visited[act.x, act.y] = true;
+
+            if (_grid[act.x, act.y] != null)
+            {
+                MovePieceToDir(act.x, act.y, dirx, diry);
+            }
+
+            q.Enqueue(new Vector2Int(act.x - dirx, act.y - diry));
+            q.Enqueue(new Vector2Int(act.x, act.y - diry));
+            q.Enqueue(new Vector2Int(act.x - dirx, act.y));
+        }
+    }
+
+    private void MovePieceToDir(int x, int y, int dirx, int diry)
+    {
+        int initialx = x;
+        int initialy = y;
+        while (x + dirx >= 0 && x + dirx < _grid.GetLength(0) &&
+               y + diry >= 0 && y + diry < _grid.GetLength(1) &&
+               _grid[x + dirx, y + diry] == null)
+        {
+            x += dirx;
+            y += diry;
+        }
+
+        if (x + dirx < 0 || x + dirx >= _grid.GetLength(0) ||
+            y + diry < 0 || y + diry >= _grid.GetLength(1))
+        {
+            if (initialx != x || initialy != y)
+            {
+                MovePieceTo(_grid[initialx, initialy], x, y);
+                _grid[x, y] = _grid[initialx, initialy];
+                _grid[initialx, initialy] = null;
+            }
+        }
+        else
+        {
+            print("Parou de mover por causa de uma peça.");
+        }
+    }
+
+    private void MovePieceTo(Piece piece, int x, int y)
+    {
+        Vector2 boardPos = GridPosToBoardPos(new Vector2Int(x, y));
+
+        piece.MoveTo(boardPos);
     }
 
     private void SpawnPiece2Random()

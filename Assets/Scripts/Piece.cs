@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Piece : MonoBehaviour
@@ -30,5 +31,10 @@ public class Piece : MonoBehaviour
         text.text = _value.ToString();
         text.color = _fontColor;
         GetComponent<RectTransform>().anchoredPosition = _anchoredPos;
+    }
+
+    public void MoveTo(Vector2 boardPos)
+    {
+        GetComponent<RectTransform>().anchoredPosition = boardPos;
     }
 }
