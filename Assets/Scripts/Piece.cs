@@ -3,17 +3,22 @@ using UnityEngine.UI;
 
 public class Piece : MonoBehaviour
 {
+    public Color[] bgColors;
+    public Color[] fontColors;
+
     private int _value;
     private Color _backgroundColor;
     private Color _fontColor;
     private Vector2 _anchoredPos;
 
-    public void Init(int value, Color backgroundColor, Color fontColor, Vector2 anchoredPos)
+    public void Init(int value, Vector2 anchoredPos)
     {
         _value = value;
-        _backgroundColor = backgroundColor;
-        _fontColor = fontColor;
         _anchoredPos = anchoredPos;
+
+        int log = (int)Mathf.Log(value, 2);
+        _backgroundColor = bgColors[Mathf.Clamp(log - 1, 0, bgColors.Length - 1)];
+        _fontColor = fontColors[Mathf.Clamp(log - 1, 0, fontColors.Length - 1)];
     }
 
     // Start is called before the first frame update

@@ -53,7 +53,7 @@ public class Board : MonoBehaviour
 
                 if (Random.value < accChance)
                 {
-                    SpawnPiece(new Vector2Int(x, y), 2);
+                    SpawnPiece(new Vector2Int(x, y), 8);
                     spawned = true;
                     break;
                 }
@@ -73,7 +73,7 @@ public class Board : MonoBehaviour
         var piece = Instantiate(piecePrefab, transform).GetComponent<Piece>();
 
         var boardPos = GridPosToBoardPos(gridPos);
-        piece.Init(value, Color.green, Color.black, boardPos);
+        piece.Init(value, boardPos);
 
         _grid[gridPos.x, gridPos.y] = piece;
 
