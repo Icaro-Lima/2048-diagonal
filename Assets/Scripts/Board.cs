@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Experimental.Rendering;
-using UnityEngine.Serialization;
+﻿using UnityEngine;
 
 public class Board : MonoBehaviour
 {
@@ -21,7 +17,7 @@ public class Board : MonoBehaviour
     private Vector2 _cornerCenterPos;
 
     private int _occupiedSlots;
-    private GameObject[,] _grid;
+    private Piece[,] _grid;
 
     // Start is called before the first frame update
     private void Start()
@@ -30,7 +26,7 @@ public class Board : MonoBehaviour
         _cornerCenterPos = corner.anchoredPosition;
 
         _occupiedSlots = 0;
-        _grid = new GameObject[gridWidth, gridHeight];
+        _grid = new Piece[gridWidth, gridHeight];
 
         SpawnPiece2Random();
         SpawnPiece2Random();
@@ -74,10 +70,10 @@ public class Board : MonoBehaviour
 
     private void SpawnPiece(Vector2Int gridPos, int value)
     {
-        var piece = Instantiate(piecePrefab, transform);
+        var piece = Instantiate(piecePrefab, transform).GetComponent<Piece>();
 
         var boardPos = GridPosToBoardPos(gridPos);
-        piece.GetComponent<RectTransform>().anchoredPosition = boardPos;
+        piece.Init(value, Color.green, Color.black, boardPos);
 
         _grid[gridPos.x, gridPos.y] = piece;
 
