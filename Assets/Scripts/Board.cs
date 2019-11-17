@@ -74,8 +74,6 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
             q.Enqueue(new Vector2Int(_grid.GetLength(0) - 1, 0));
         }
 
-        int idx = 0;
-        int[,] order = new int[_grid.GetLength(0), _grid.GetLength(1)];
         bool[,] visited = new bool[_grid.GetLength(0), _grid.GetLength(1)];
         while (q.Count > 0)
         {
@@ -90,8 +88,6 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
             {
                 continue;
             }
-
-            order[act.x, act.y] = idx++;
 
             visited[act.x, act.y] = true;
 
