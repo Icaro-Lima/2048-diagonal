@@ -97,7 +97,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
             if (_grid[act.x, act.y] != null)
             {
-                MovePieceToDir(act.x, act.y, dirx, diry);
+                MovePieceToDir(new Vector2Int(act.x, act.y), new Vector2Int(dirx, diry));
             }
 
             q.Enqueue(new Vector2Int(act.x - dirx, act.y - diry));
@@ -106,26 +106,21 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         }
     }
 
-    private void MovePieceToDir(int x, int y, int dirx, int diry)
+    private void MovePieceToDir(Vector2Int pos, Vector2Int dir)
     {
-        int initialx = x;
-        int initialy = y;
-        while (x + dirx >= 0 && x + dirx < _grid.GetLength(0) &&
-               y + diry >= 0 && y + diry < _grid.GetLength(1) &&
-               _grid[x + dirx, y + diry] == null)
+        Vector2Int iniPos = pos;
+        while (IsOnGridBounds(pos + dir) && _grid[pos.x + dir.x, pos.y + dir.y] == null)
         {
-            x += dirx;
-            y += diry;
+            pos += dir;
         }
 
-        if (x + dirx < 0 || x + dirx >= _grid.GetLength(0) ||
-            y + diry < 0 || y + diry >= _grid.GetLength(1))
+        if (!IsOnGridBounds(pos + dir))
         {
-            if (initialx != x || initialy != y)
+            if (iniPos.x != pos.x || iniPos.y != pos.y)
             {
-                MovePieceTo(_grid[initialx, initialy], x, y);
-                _grid[x, y] = _grid[initialx, initialy];
-                _grid[initialx, initialy] = null;
+                MovePieceTo(_grid[iniPos.x, iniPos.y], pos);
+                _grid[pos.x, pos.y] = _grid[iniPos.x, iniPos.y];
+                _grid[iniPos.x, iniPos.y] = null;
             }
         }
         else
@@ -134,9 +129,14 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         }
     }
 
-    private void MovePieceTo(Piece piece, int x, int y)
+    private bool IsOnGridBounds(Vector2Int pos)
     {
-        Vector2 boardPos = GridPosToBoardPos(new Vector2Int(x, y));
+        return pos.x >= 0 && pos.y >= 0 && pos.x < _grid.GetLength(0) && pos.y < _grid.GetLength(1);
+    }
+
+    private void MovePieceTo(Piece piece, Vector2Int pos)
+    {
+        Vector2 boardPos = GridPosToBoardPos(pos);
 
         piece.MoveTo(boardPos);
     }
