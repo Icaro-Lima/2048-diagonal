@@ -26,7 +26,7 @@ public class Piece : MonoBehaviour
     {
         GetComponent<Image>().color = _backgroundColor;
 
-        var text = GetComponentInChildren<Text>();
+        Text text = GetComponentInChildren<Text>();
         text.text = _value.ToString();
         text.color = _fontColor;
         GetComponent<RectTransform>().anchoredPosition = _anchoredPos;

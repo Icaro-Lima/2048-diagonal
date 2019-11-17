@@ -34,17 +34,17 @@ public class Board : MonoBehaviour
 
     private void SpawnPiece2Random()
     {
-        var slots = _grid.GetLength(0) * _grid.GetLength(1);
+        int slots = _grid.GetLength(0) * _grid.GetLength(1);
 
-        var freeSlots = slots - _occupiedSlots;
+        int freeSlots = slots - _occupiedSlots;
 
-        var chance = 1.0f / freeSlots;
-        var accChance = chance;
+        float chance = 1.0f / freeSlots;
+        float accChance = chance;
 
-        var spawned = false;
-        for (var x = 0; x < _grid.GetLength(0); x++)
+        bool spawned = false;
+        for (int x = 0; x < _grid.GetLength(0); x++)
         {
-            for (var y = 0; y < _grid.GetLength(1); y++)
+            for (int y = 0; y < _grid.GetLength(1); y++)
             {
                 if (_grid[x, y] != null)
                 {
@@ -53,7 +53,7 @@ public class Board : MonoBehaviour
 
                 if (Random.value < accChance)
                 {
-                    SpawnPiece(new Vector2Int(x, y), 8);
+                    SpawnPiece(new Vector2Int(x, y), 2);
                     spawned = true;
                     break;
                 }
@@ -70,9 +70,9 @@ public class Board : MonoBehaviour
 
     private void SpawnPiece(Vector2Int gridPos, int value)
     {
-        var piece = Instantiate(piecePrefab, transform).GetComponent<Piece>();
+        Piece piece = Instantiate(piecePrefab, transform).GetComponent<Piece>();
 
-        var boardPos = GridPosToBoardPos(gridPos);
+        Vector2 boardPos = GridPosToBoardPos(gridPos);
         piece.Init(value, boardPos);
 
         _grid[gridPos.x, gridPos.y] = piece;
