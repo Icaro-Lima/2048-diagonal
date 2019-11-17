@@ -5,11 +5,24 @@ using UnityEngine.UI;
 
 public class Piece : MonoBehaviour
 {
+    private struct Action
+    {
+        public Vector2 targetPos;
+        public Piece pieceToMerge;
+
+        public Action(Vector2 targetPos, Piece pieceToMerge)
+        {
+            this.targetPos = targetPos;
+            this.pieceToMerge = pieceToMerge;
+        }
+    }
+
     public Color[] bgColors;
     public Color[] fontColors;
 
     // Init
-    private int _value;
+    public int value { get; private set; }
+
     private Color _backgroundColor;
     private Color _fontColor;
     private Vector2 _anchoredPos;
@@ -17,16 +30,12 @@ public class Piece : MonoBehaviour
     // Start
     private RectTransform _rectTransform;
 
-    private Queue<Vector2> _targetPositions;
+    private Queue<Action> _targetPositions;
 
     public void Init(int value, Vector2 anchoredPos)
     {
-        _value = value;
+        this.value = value;
         _anchoredPos = anchoredPos;
-
-        int log = (int)Mathf.Log(value, 2);
-        _backgroundColor = bgColors[Mathf.Clamp(log - 1, 0, bgColors.Length - 1)];
-        _fontColor = fontColors[Mathf.Clamp(log - 1, 0, fontColors.Length - 1)];
     }
 
     // Start is called before the first frame update
@@ -36,27 +45,31 @@ public class Piece : MonoBehaviour
 
         _rectTransform.anchoredPosition = _anchoredPos;
 
-        GetComponent<Image>().color = _backgroundColor;
+        _targetPositions = new Queue<Action>();
 
-        Text text = GetComponentInChildren<Text>();
-        text.text = _value.ToString();
-        text.color = _fontColor;
-
-        _targetPositions = new Queue<Vector2>();
+        UpdateColorsAndText();
     }
 
     private void Update()
     {
-        const float speed = 90;
+        const float speed = 10;
 
         if (_targetPositions.Count > 0)
         {
-            Vector2 targetPos = _targetPositions.Peek();
+            Vector2 targetPos = _targetPositions.Peek().targetPos;
+            Piece targetPiece = _targetPositions.Peek().pieceToMerge;
 
             _rectTransform.anchoredPosition = Vector2.MoveTowards(_rectTransform.anchoredPosition, targetPos, speed);
 
             if (targetPos == _rectTransform.anchoredPosition)
             {
+                if (targetPiece != null)
+                {
+                    Destroy(targetPiece.gameObject);
+
+                    UpdateColorsAndText();
+                }
+
                 _targetPositions.Dequeue();
             }
         }
@@ -64,6 +77,26 @@ public class Piece : MonoBehaviour
 
     public void MoveTo(Vector2 boardPos)
     {
-        _targetPositions.Enqueue(boardPos);
+        _targetPositions.Enqueue(new Action(boardPos, null));
+    }
+
+    public void Merge(Piece other, Vector2 boardPos)
+    {
+        // This is the logical value. Can be separated with another matrix.
+        value = value + other.value;
+        _targetPositions.Enqueue(new Action(boardPos, other));
+    }
+
+    private void UpdateColorsAndText()
+    {
+        int log = (int)Mathf.Log(value, 2);
+        Color backgroundColor = bgColors[Mathf.Clamp(log - 1, 0, bgColors.Length - 1)];
+        Color fontColor = fontColors[Mathf.Clamp(log - 1, 0, fontColors.Length - 1)];
+
+        GetComponent<Image>().color = backgroundColor;
+
+        Text text = GetComponentInChildren<Text>();
+        text.text = value.ToString();
+        text.color = fontColor;
     }
 }

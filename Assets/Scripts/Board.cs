@@ -125,7 +125,25 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         }
         else
         {
-            print("Parou de mover por causa de uma peça.");
+            Piece my = _grid[iniPos.x, iniPos.y];
+            Piece other = _grid[pos.x + dir.x, pos.y + dir.y];
+
+            if (other.value == my.value)
+            {
+                MergePiece(my, other, pos + dir);
+                _occupiedSlots--;
+                _grid[pos.x + dir.x, pos.y + dir.y] = my;
+                _grid[iniPos.x, iniPos.y] = null;
+            }
+            else
+            {
+                if (iniPos.x != pos.x || iniPos.y != pos.y)
+                {
+                    MovePieceTo(my, pos);
+                    _grid[pos.x, pos.y] = my;
+                    _grid[iniPos.x, iniPos.y] = null;
+                }
+            }
         }
     }
 
@@ -139,6 +157,13 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         Vector2 boardPos = GridPosToBoardPos(pos);
 
         piece.MoveTo(boardPos);
+    }
+
+    private void MergePiece(Piece piece, Piece other, Vector2Int pos)
+    {
+        Vector2 boardPos = GridPosToBoardPos(pos);
+
+        piece.Merge(other, boardPos);
     }
 
     private void SpawnPiece2Random()
