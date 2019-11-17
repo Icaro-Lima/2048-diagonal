@@ -559,7 +559,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d74d9cb699ab1d64b9d10016c5c426ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  piece: {fileID: 7348923309853020975, guid: 49d24d5cf16eeff4bb2323c19ba70f4a, type: 3}
+  piecePrefab: {fileID: 7348923309853020975, guid: 49d24d5cf16eeff4bb2323c19ba70f4a,
+    type: 3}
   corner: {fileID: 1250164864}
   pieceBackgroundColors:
   - {r: 0.9333334, g: 0.8941177, b: 0.854902, a: 0}
