@@ -52,7 +52,7 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
-        const float speed = 90;
+        const float speed = 75;
 
         if (_targetPositions.Count > 0)
         {
@@ -71,6 +71,19 @@ public class Piece : MonoBehaviour
                 }
 
                 _targetPositions.Dequeue();
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        while (_targetPositions.Count > 0)
+        {
+            Action action = _targetPositions.Dequeue();
+
+            if (action.pieceToMerge != null)
+            {
+                Destroy(action.pieceToMerge.gameObject);
             }
         }
     }
