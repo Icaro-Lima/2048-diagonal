@@ -74,6 +74,8 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
             q.Enqueue(new Vector2Int(_grid.GetLength(0) - 1, 0));
         }
 
+        bool[,] merged = new bool[_grid.GetLength(0), _grid.GetLength(1)];
+
         bool[,] visited = new bool[_grid.GetLength(0), _grid.GetLength(1)];
         while (q.Count > 0)
         {
@@ -93,7 +95,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
             if (_grid[act.x, act.y] != null)
             {
-                MovePieceToDir(new Vector2Int(act.x, act.y), new Vector2Int(dirx, diry));
+                MovePieceToDir(new Vector2Int(act.x, act.y), new Vector2Int(dirx, diry), ref merged);
             }
 
             q.Enqueue(new Vector2Int(act.x - dirx, act.y - diry));
@@ -102,7 +104,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         }
     }
 
-    private void MovePieceToDir(Vector2Int pos, Vector2Int dir)
+    private void MovePieceToDir(Vector2Int pos, Vector2Int dir, ref bool[,] merged)
     {
         Vector2Int iniPos = pos;
         while (IsOnGridBounds(pos + dir) && _grid[pos.x + dir.x, pos.y + dir.y] == null)
@@ -124,11 +126,12 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
             Piece my = _grid[iniPos.x, iniPos.y];
             Piece other = _grid[pos.x + dir.x, pos.y + dir.y];
 
-            if (other.value == my.value)
+            if (other.value == my.value && !merged[pos.x + dir.x, pos.y + dir.y])
             {
                 MergePiece(my, other, pos + dir);
                 _occupiedSlots--;
                 _grid[pos.x + dir.x, pos.y + dir.y] = my;
+                merged[pos.x + dir.x, pos.y + dir.y] = true;
                 _grid[iniPos.x, iniPos.y] = null;
             }
             else

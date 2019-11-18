@@ -52,7 +52,7 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
-        const float speed = 10;
+        const float speed = 90;
 
         if (_targetPositions.Count > 0)
         {
