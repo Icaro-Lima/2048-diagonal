@@ -23,8 +23,6 @@ public class Piece : MonoBehaviour
     // Init
     public int value { get; private set; }
 
-    private Color _backgroundColor;
-    private Color _fontColor;
     private Vector2 _anchoredPos;
 
     // Start
@@ -65,6 +63,7 @@ public class Piece : MonoBehaviour
             {
                 if (targetPiece != null)
                 {
+                    value += targetPiece.value;
                     Destroy(targetPiece.gameObject);
 
                     UpdateColorsAndText();
@@ -95,8 +94,6 @@ public class Piece : MonoBehaviour
 
     public void Merge(Piece other, Vector2 boardPos)
     {
-        // This is the logical value. Can be separated with another matrix.
-        value = value + other.value;
         _targetPositions.Enqueue(new Action(boardPos, other));
     }
 

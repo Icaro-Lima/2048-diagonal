@@ -17,8 +17,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
     private Vector2 _pieceSize;
     private Vector2 _cornerCenterPos;
 
-    private int _occupiedSlots;
-    private Piece[,] _grid;
+    private Slots _slots;
 
     private Vector2 _beginDragPos;
 
@@ -28,8 +27,8 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         _pieceSize = corner.sizeDelta;
         _cornerCenterPos = corner.anchoredPosition;
 
-        _occupiedSlots = 0;
-        _grid = new Piece[gridColumns, gridRows];
+
+        _slots = new Slots(gridColumns, gridRows);
 
         SpawnPiece2Random();
         SpawnPiece2Random();
@@ -59,11 +58,11 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
         if (dirx == 1 && diry == 1)
         {
-            q.Enqueue(new Vector2Int(_grid.GetLength(0) - 1, _grid.GetLength(1) - 1));
+            q.Enqueue(_slots.size - new Vector2Int(1, 1));
         }
         else if (dirx == -1 && diry == 1)
         {
-            q.Enqueue(new Vector2Int(0, _grid.GetLength(1) - 1));
+            q.Enqueue(new Vector2Int(0, _slots.size.y - 1));
         }
         else if (dirx == -1 && diry == -1)
         {
@@ -71,17 +70,17 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         }
         else
         {
-            q.Enqueue(new Vector2Int(_grid.GetLength(0) - 1, 0));
+            q.Enqueue(new Vector2Int(_slots.size.x - 1, 0));
         }
 
-        bool[,] merged = new bool[_grid.GetLength(0), _grid.GetLength(1)];
+        bool[,] merged = new bool[_slots.size.x, _slots.size.y];
 
-        bool[,] visited = new bool[_grid.GetLength(0), _grid.GetLength(1)];
+        bool[,] visited = new bool[_slots.size.x, _slots.size.y];
         while (q.Count > 0)
         {
             Vector2Int act = q.Dequeue();
 
-            if (act.x < 0 || act.y < 0 || act.x >= _grid.GetLength(0) || act.y >= _grid.GetLength(1))
+            if (act.x < 0 || act.y < 0 || act.x >= _slots.size.x || act.y >= _slots.size.y)
             {
                 continue;
             }
@@ -93,7 +92,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
             visited[act.x, act.y] = true;
 
-            if (_grid[act.x, act.y] != null)
+            if (_slots[act] != null)
             {
                 MovePieceToDir(new Vector2Int(act.x, act.y), new Vector2Int(dirx, diry), ref merged);
             }
@@ -107,48 +106,43 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
     private void MovePieceToDir(Vector2Int pos, Vector2Int dir, ref bool[,] merged)
     {
         Vector2Int iniPos = pos;
-        while (IsOnGridBounds(pos + dir) && _grid[pos.x + dir.x, pos.y + dir.y] == null)
+        while (_slots.IsInside(pos + dir) && _slots[pos + dir] == null)
         {
             pos += dir;
         }
 
-        if (!IsOnGridBounds(pos + dir))
+        if (!_slots.IsInside(pos + dir))
         {
             if (iniPos.x != pos.x || iniPos.y != pos.y)
             {
-                MovePieceTo(_grid[iniPos.x, iniPos.y], pos);
-                _grid[pos.x, pos.y] = _grid[iniPos.x, iniPos.y];
-                _grid[iniPos.x, iniPos.y] = null;
+                MovePieceTo(_slots[iniPos].piece, pos);
+                _slots[pos] = _slots[iniPos];
+                _slots[iniPos] = null;
             }
         }
         else
         {
-            Piece my = _grid[iniPos.x, iniPos.y];
-            Piece other = _grid[pos.x + dir.x, pos.y + dir.y];
+            Slot my = _slots[iniPos];
+            Slot other = _slots[pos + dir];
 
             if (other.value == my.value && !merged[pos.x + dir.x, pos.y + dir.y])
             {
-                MergePiece(my, other, pos + dir);
-                _occupiedSlots--;
-                _grid[pos.x + dir.x, pos.y + dir.y] = my;
+                MergePiece(my.piece, other.piece, pos + dir);
+                my.value += other.value;
+                _slots[pos + dir] = my;
                 merged[pos.x + dir.x, pos.y + dir.y] = true;
-                _grid[iniPos.x, iniPos.y] = null;
+                _slots[iniPos] = null;
             }
             else
             {
                 if (iniPos.x != pos.x || iniPos.y != pos.y)
                 {
-                    MovePieceTo(my, pos);
-                    _grid[pos.x, pos.y] = my;
-                    _grid[iniPos.x, iniPos.y] = null;
+                    MovePieceTo(my.piece, pos);
+                    _slots[pos] = my;
+                    _slots[iniPos] = null;
                 }
             }
         }
-    }
-
-    private bool IsOnGridBounds(Vector2Int pos)
-    {
-        return pos.x >= 0 && pos.y >= 0 && pos.x < _grid.GetLength(0) && pos.y < _grid.GetLength(1);
     }
 
     private void MovePieceTo(Piece piece, Vector2Int pos)
@@ -167,19 +161,17 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
     private void SpawnPiece2Random()
     {
-        int slots = _grid.GetLength(0) * _grid.GetLength(1);
-
-        int freeSlots = slots - _occupiedSlots;
+        int freeSlots = _slots.freeSlots;
 
         float chance = 1.0f / freeSlots;
         float accChance = chance;
 
         bool spawned = false;
-        for (int x = 0; x < _grid.GetLength(0); x++)
+        for (int x = 0; x < _slots.size.x; x++)
         {
-            for (int y = 0; y < _grid.GetLength(1); y++)
+            for (int y = 0; y < _slots.size.y; y++)
             {
-                if (_grid[x, y] != null)
+                if (_slots[x, y] != null)
                 {
                     continue;
                 }
@@ -208,9 +200,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         Vector2 boardPos = GridPosToBoardPos(gridPos);
         piece.Init(value, boardPos);
 
-        _grid[gridPos.x, gridPos.y] = piece;
-
-        _occupiedSlots++;
+        _slots[gridPos] = new Slot(piece, value);
     }
 
     private Vector2 GridPosToBoardPos(Vector2Int gridPos)
