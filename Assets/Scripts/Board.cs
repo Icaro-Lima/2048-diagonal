@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
@@ -15,6 +16,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
     public int gridColumns;
 
     public PieceMergedEvent pieceMergedEvent;
+    public UnityEvent onGameOver;
 
     private Vector2 _pieceSize;
     private Vector2 _cornerCenterPos;
@@ -28,6 +30,11 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         if (pieceMergedEvent == null)
         {
             pieceMergedEvent = new PieceMergedEvent();
+        }
+
+        if (onGameOver == null)
+        {
+            onGameOver = new UnityEvent();
         }
     }
 
@@ -56,10 +63,42 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        bool CheckGameOver()
+        {
+            bool gameOver = true;
+            for (int x = 0; x < _slots.size.x; x++)
+            {
+                for (int y = 0; y < _slots.size.y; y++)
+                {
+                    if (_slots.CanMove(new Vector2Int(x, y)))
+                    {
+                        gameOver = false;
+                        break;
+                    }
+                }
+
+                if (!gameOver)
+                {
+                    break;
+                }
+            }
+
+            return gameOver;
+        }
+
         Vector2 diff = eventData.position - _beginDragPos;
 
         MoveBoardToDir(diff.x >= 0 ? 1 : -1, diff.y >= 0 ? 1 : -1);
-        SpawnPiece2Random();
+
+        if (!CheckGameOver())
+        {
+            SpawnPiece2Random();
+        }
+        else
+        {
+            print("Invocado!");
+            onGameOver.Invoke();
+        }
     }
 
     private void MoveBoardToDir(int dirx, int diry)
