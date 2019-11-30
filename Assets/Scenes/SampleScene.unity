@@ -191,6 +191,7 @@ GameObject:
   - component: {fileID: 81605420}
   - component: {fileID: 81605422}
   - component: {fileID: 81605423}
+  - component: {fileID: 81605424}
   m_Layer: 5
   m_Name: Score
   m_TagString: Untagged
@@ -289,6 +290,19 @@ MonoBehaviour:
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
+--- !u!114 &81605424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81605418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4398194f51dd1a54bbbe072af92446da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 1905303521}
 --- !u!1 &360504326
 GameObject:
   m_ObjectHideFlags: 0
@@ -754,6 +768,20 @@ MonoBehaviour:
   boardGridThickness: 12
   gridRows: 4
   gridColumns: 4
+  pieceMergedEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 81605424}
+        m_MethodName: PieceMerged
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1905303519
 GameObject:
   m_ObjectHideFlags: 0

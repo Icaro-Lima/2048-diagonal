@@ -14,12 +14,22 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
     public int gridRows;
     public int gridColumns;
 
+    public PieceMergedEvent pieceMergedEvent;
+
     private Vector2 _pieceSize;
     private Vector2 _cornerCenterPos;
 
     private Slots _slots;
 
     private Vector2 _beginDragPos;
+
+    private void Awake()
+    {
+        if (pieceMergedEvent == null)
+        {
+            pieceMergedEvent = new PieceMergedEvent();
+        }
+    }
 
     // Start is called before the first frame update
     private void Start()
@@ -128,6 +138,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
             if (other.value == my.value && !merged[pos.x + dir.x, pos.y + dir.y])
             {
                 MergePiece(my.piece, other.piece, pos + dir);
+                pieceMergedEvent.Invoke(my.value, other.value);
                 my.value += other.value;
                 _slots[pos + dir] = my;
                 merged[pos.x + dir.x, pos.y + dir.y] = true;
