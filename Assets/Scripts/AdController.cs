@@ -15,7 +15,7 @@ public class AdController : MonoBehaviour, IUnityAdsListener
     private void Start()
     {
         Advertisement.AddListener(this);
-        Advertisement.Initialize(ANDROID_PLAY_STORE_ID, true);
+        Advertisement.Initialize(ANDROID_PLAY_STORE_ID, false);
     }
 
     public void OnUnityAdsDidError(string message)
