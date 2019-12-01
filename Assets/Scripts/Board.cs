@@ -88,21 +88,23 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
         Vector2 diff = eventData.position - _beginDragPos;
 
-        MoveBoardToDir(diff.x >= 0 ? 1 : -1, diff.y >= 0 ? 1 : -1);
+        bool movedAnyPiece = MoveBoardToDir(diff.x >= 0 ? 1 : -1, diff.y >= 0 ? 1 : -1);
 
-        if (!CheckGameOver())
+        if (movedAnyPiece)
         {
             SpawnPiece2Random();
         }
-        else
+
+        if (CheckGameOver())
         {
-            print("Invocado!");
             onGameOver.Invoke();
         }
     }
 
-    private void MoveBoardToDir(int dirx, int diry)
+    private bool MoveBoardToDir(int dirx, int diry)
     {
+        bool movedAnyPiece = false;
+
         Queue<Vector2Int> q = new Queue<Vector2Int>();
 
         if (dirx == 1 && diry == 1)
@@ -143,17 +145,26 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
             if (_slots[act] != null)
             {
-                MovePieceToDir(new Vector2Int(act.x, act.y), new Vector2Int(dirx, diry), ref merged);
+                bool movedThisPiece = MovePieceToDir(new Vector2Int(act.x, act.y), new Vector2Int(dirx, diry), ref merged);
+
+                if (movedThisPiece)
+                {
+                    movedAnyPiece = true;
+                }
             }
 
             q.Enqueue(new Vector2Int(act.x - dirx, act.y - diry));
             q.Enqueue(new Vector2Int(act.x, act.y - diry));
             q.Enqueue(new Vector2Int(act.x - dirx, act.y));
         }
+
+        return movedAnyPiece;
     }
 
-    private void MovePieceToDir(Vector2Int pos, Vector2Int dir, ref bool[,] merged)
+    private bool MovePieceToDir(Vector2Int pos, Vector2Int dir, ref bool[,] merged)
     {
+        bool pieceMoved = false;
+
         Vector2Int iniPos = pos;
         while (_slots.IsInside(pos + dir) && _slots[pos + dir] == null)
         {
@@ -164,6 +175,8 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         {
             if (iniPos.x != pos.x || iniPos.y != pos.y)
             {
+                pieceMoved = true;
+
                 MovePieceTo(_slots[iniPos].piece, pos);
                 _slots[pos] = _slots[iniPos];
                 _slots[iniPos] = null;
@@ -176,6 +189,8 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
             if (other.value == my.value && !merged[pos.x + dir.x, pos.y + dir.y])
             {
+                pieceMoved = true;
+
                 MergePiece(my.piece, other.piece, pos + dir);
                 pieceMergedEvent.Invoke(my.value, other.value);
                 my.value += other.value;
@@ -187,12 +202,16 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
             {
                 if (iniPos.x != pos.x || iniPos.y != pos.y)
                 {
+                    pieceMoved = true;
+
                     MovePieceTo(my.piece, pos);
                     _slots[pos] = my;
                     _slots[iniPos] = null;
                 }
             }
         }
+
+        return pieceMoved;
     }
 
     private void MovePieceTo(Piece piece, Vector2Int pos)
