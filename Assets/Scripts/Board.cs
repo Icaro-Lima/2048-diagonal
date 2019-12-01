@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler
 {
     public GameObject piecePrefab;
 
@@ -24,6 +24,8 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
     private Slots _slots;
 
     private Vector2 _beginDragPos;
+
+    private bool ignoreNextDrag;
 
     private void Awake()
     {
@@ -54,15 +56,30 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
     public void OnBeginDrag(PointerEventData eventData)
     {
         _beginDragPos = eventData.position;
+
+        ignoreNextDrag = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (ignoreNextDrag)
+        {
+            return;
+        }
 
-    }
+        int dragThreshold = EventSystem.current.pixelDragThreshold;
+        dragThreshold = 4 * Mathf.Max(dragThreshold,
+                                      (int)(dragThreshold * Screen.dpi / 160f));
 
-    public void OnEndDrag(PointerEventData eventData)
-    {
+        Vector2 delta = eventData.position - _beginDragPos;
+
+        if (delta.magnitude < dragThreshold)
+        {
+            return;
+        }
+
+        ignoreNextDrag = true;
+
         bool CheckGameOver()
         {
             bool gameOver = true;
@@ -86,9 +103,7 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
             return gameOver;
         }
 
-        Vector2 diff = eventData.position - _beginDragPos;
-
-        bool movedAnyPiece = MoveBoardToDir(diff.x >= 0 ? 1 : -1, diff.y >= 0 ? 1 : -1);
+        bool movedAnyPiece = MoveBoardToDir(delta.x >= 0 ? 1 : -1, delta.y >= 0 ? 1 : -1);
 
         if (movedAnyPiece)
         {
