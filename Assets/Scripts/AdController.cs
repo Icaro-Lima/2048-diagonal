@@ -18,6 +18,14 @@ public class AdController : MonoBehaviour, IUnityAdsListener
         Advertisement.Initialize(ANDROID_PLAY_STORE_ID, false);
     }
 
+    public void TryShowVideoAd()
+    {
+        if (Advertisement.IsReady(VIDEO_AD))
+        {
+            Advertisement.Show(VIDEO_AD);
+        }
+    }
+
     public void OnUnityAdsDidError(string message)
     {
         // ...
