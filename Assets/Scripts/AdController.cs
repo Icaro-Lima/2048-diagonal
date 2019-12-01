@@ -8,7 +8,7 @@ public class AdController : MonoBehaviour, IUnityAdsListener
     private const string ANDROID_PLAY_STORE_ID = "3381670";
     private const string APPLE_APP_STORE_ID = "3381671";
 
-    private const string VIDEO_AD = "video";
+    private const string INTERSTITIAL_VIDEO_AD = "interstitialVideo";
     private const string BANNER_AD = "banner";
 
     // Start is called before the first frame update
@@ -20,9 +20,9 @@ public class AdController : MonoBehaviour, IUnityAdsListener
 
     public void TryShowVideoAd()
     {
-        if (Advertisement.IsReady(VIDEO_AD))
+        if (Advertisement.IsReady(INTERSTITIAL_VIDEO_AD))
         {
-            Advertisement.Show(VIDEO_AD);
+            Advertisement.Show(INTERSTITIAL_VIDEO_AD);
         }
     }
 
