@@ -6,11 +6,15 @@ using UnityEngine.UI;
 
 public class Reload : MonoBehaviour
 {
+    public Sprite spriteOnGameOver;
+
+    private Image image;
     private Button button;
 
     // Start is called before the first frame update
     private void Start()
     {
+        image = GetComponent<Image>();
         button = GetComponent<Button>();
 
         button.onClick.AddListener(() =>
@@ -19,9 +23,8 @@ public class Reload : MonoBehaviour
         });
     }
 
-    // Update is called once per frame
-    private void Update()
+    public void OnGameOver()
     {
-
+        image.overrideSprite = spriteOnGameOver;
     }
 }
