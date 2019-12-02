@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler
+public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     public GameObject piecePrefab;
 
@@ -80,6 +80,23 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler
 
         ignoreNextDrag = true;
 
+        MoveBoard(delta);
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (ignoreNextDrag)
+        {
+            return;
+        }
+
+        Vector2 delta = eventData.position - _beginDragPos;
+
+        MoveBoard(delta);
+    }
+
+    private void MoveBoard(Vector2 delta)
+    {
         bool CheckGameOver()
         {
             bool gameOver = true;
