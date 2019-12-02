@@ -163,7 +163,7 @@ PlayerSettings:
     Android: com.CoffeeLeak.TwoRaisedElevenDiagonal
     Standalone: com.Company.ProductName
   buildNumber: {}
-  AndroidBundleVersionCode: 11
+  AndroidBundleVersionCode: 12
   AndroidMinSdkVersion: 16
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1

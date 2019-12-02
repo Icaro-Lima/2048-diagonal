@@ -1318,8 +1318,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -265.50003, y: -265.5}
-  m_SizeDelta: {x: 165, y: 165}
+  m_AnchoredPosition: {x: -284, y: -284}
+  m_SizeDelta: {x: 132, y: 132}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1250164866
 CanvasRenderer:
@@ -1709,9 +1709,9 @@ MonoBehaviour:
   piecePrefab: {fileID: 7348923309853020975, guid: 49d24d5cf16eeff4bb2323c19ba70f4a,
     type: 3}
   corner: {fileID: 1250164864}
-  boardGridThickness: 12
-  gridRows: 4
-  gridColumns: 4
+  boardGridThickness: 10
+  gridRows: 5
+  gridColumns: 5
   pieceMergedEvent:
     m_PersistentCalls:
       m_Calls:
