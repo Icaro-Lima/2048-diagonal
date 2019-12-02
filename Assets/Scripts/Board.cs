@@ -68,8 +68,8 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
         }
 
         int dragThreshold = EventSystem.current.pixelDragThreshold;
-        dragThreshold = 4 * Mathf.Max(dragThreshold,
-                                      (int)(dragThreshold * Screen.dpi / 160f));
+        dragThreshold = (int)(2.5f * Mathf.Max(dragThreshold,
+                                      dragThreshold * Screen.dpi / 160f));
 
         Vector2 delta = eventData.position - _beginDragPos;
 
