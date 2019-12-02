@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class Board : MonoBehaviour
 {
     public GameObject piecePrefab;
 
@@ -23,9 +23,9 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
     private Slots _slots;
 
-    private Vector2 _beginDragPos;
-
-    private bool ignoreNextDrag;
+    private Vector2 _startPos;
+    private float _swipeThreshold;
+    private bool _alreadySwiped;
 
     private void Awake()
     {
@@ -49,50 +49,35 @@ public class Board : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHan
 
         _slots = new Slots(gridColumns, gridRows);
 
+        _swipeThreshold = EventSystem.current.pixelDragThreshold;
+        _swipeThreshold = Mathf.Max(_swipeThreshold, _swipeThreshold * Screen.dpi / 160f);
+
         SpawnPiece2Random();
         SpawnPiece2Random();
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    private void Update()
     {
-        _beginDragPos = eventData.position;
-
-        ignoreNextDrag = false;
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (ignoreNextDrag)
+        if (Input.touchCount == 1)
         {
-            return;
+            Touch t = Input.GetTouch(0);
+            if (t.phase == TouchPhase.Began)
+            {
+                _startPos = t.position;
+                _alreadySwiped = false;
+            }
+            if (t.phase == TouchPhase.Moved && !_alreadySwiped)
+            {
+                Vector2 delta = t.position - _startPos;
+
+                if (delta.magnitude >= _swipeThreshold)
+                {
+                    _alreadySwiped = true;
+
+                    MoveBoard(delta);
+                }
+            }
         }
-
-        int dragThreshold = EventSystem.current.pixelDragThreshold;
-        dragThreshold = (int)(2.5f * Mathf.Max(dragThreshold,
-                                      dragThreshold * Screen.dpi / 160f));
-
-        Vector2 delta = eventData.position - _beginDragPos;
-
-        if (delta.magnitude < dragThreshold)
-        {
-            return;
-        }
-
-        ignoreNextDrag = true;
-
-        MoveBoard(delta);
-    }
-
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        if (ignoreNextDrag)
-        {
-            return;
-        }
-
-        Vector2 delta = eventData.position - _beginDragPos;
-
-        MoveBoard(delta);
     }
 
     private void MoveBoard(Vector2 delta)
