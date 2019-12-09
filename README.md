@@ -5,8 +5,8 @@
 [<img src="https://images-na.ssl-images-amazon.com/images/G/01/mobile-apps/devportal2/res/images/amazon-appstore-badge-english-white.png" height=80>](https://www.amazon.com.br/CoffeeLeak-2048-Diagonal/dp/B0829B4PTY)
 
 ## Images
-<img src="https://images-na.ssl-images-amazon.com/images/I/41HIJx43o2L.png" width=200>
+<img src="https://images-na.ssl-images-amazon.com/images/I/41HIJx43o2L.png" width=300>
 <p float="left">
-  <img src="https://images-na.ssl-images-amazon.com/images/I/51zKVwJlqML.png" width="100">
-  <img src="https://images-na.ssl-images-amazon.com/images/I/51mtdHIgzxL.png" width="100">
+  <img src="https://images-na.ssl-images-amazon.com/images/I/51zKVwJlqML.png" width="150">
+  <img src="https://images-na.ssl-images-amazon.com/images/I/51mtdHIgzxL.png" width="150">
 </p>
